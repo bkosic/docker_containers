@@ -1,0 +1,6 @@
+---
+db:
+  image: db
+web:
+  image: web
+  links:
