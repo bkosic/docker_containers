@@ -1,0 +1,1 @@
+docker run -d -it --name cassandra --ulimit nofile=10000:10000 bkosic/db bash
