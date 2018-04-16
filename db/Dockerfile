@@ -14,7 +14,9 @@ RUN echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | tee -a /e
     && apt-get update \
     && apt-get install cassandra -y \
     && sed  -i "/^[^#]*ulimit/ s/.*/#&/"  /etc/init.d/cassandra \
-    && sed -i "s\Test Cluster\DB Cluster\g" /etc/cassandra/cassandra.yaml
+    && sed -i "s\Test Cluster\db-cassandra\g" /etc/cassandra/cassandra.yaml \
+    && sed -i "s\rpc_address: localhost\rpc_address: eth0@if151\g" /etc/cassandra/cassandra.yaml \
+    && sed -i "s\listen_address: localhost\rpc_address: eth0@if151\g" /etc/cassandra/cassandra.yaml
 
 COPY start.sh start.sh
 RUN chmod +x /start.sh

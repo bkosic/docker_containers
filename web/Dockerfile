@@ -6,7 +6,7 @@ MAINTAINER bkosic
 RUN apt-get update && apt-get upgrade -y
 
 #Install dependencies
-RUN apt-get install wget checkinstall apt-utils dpkg -y
+RUN apt-get install wget checkinstall apt-utils git dpkg -y
 
 #Install PCRE
 RUN cd /tmp \
@@ -32,15 +32,18 @@ RUN cd /tmp \
 
 #Install OpenSSL
 RUN apt-get install openssl -y
-#RUN cd /tmp \
-#	&& mkdir openssl \
-#	&& cd openssl \
-#	&& wget wget http://www.openssl.org/source/openssl-1.0.2k.tar.gz \
-#	&& tar -zxf openssl-1.0.2k.tar.gz \
-#	&& cd openssl-1.0.2k \
-#	&& ./Configure darwin64-x86_64-cc --prefix=/usr \
-#	&& make \
-#	&& make install
+#Install go
+RUN cd /tmp \
+	&& wget https://dl.google.com/go/go1.10.1.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xzf go1.10.1.linux-amd64.tar.gz
+
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+#Install GoCQL driver
+RUN /usr/local/go/bin/go get github.com/gocql/gocql
+RUN mkdir -p /usr/local/app
+COPY gocode/app.go /usr/local/app/app.go
+# /usr/local/go/bin/go run /usr/local/app/app.go
 
 # Install nginx
 RUN cd /tmp \
@@ -52,8 +55,13 @@ RUN cd /tmp \
 	&& ./configure --prefix=/opt/nginx --add-dynamic-module=/tmp/nginx-1.12.1/headers-more-nginx-module-0.33 \
 	&& make \
 	&& checkinstall \
-	&& dpkg -i /tmp/nginx-1.12.1/nginx_1.12.1-1_amd64.deb 
+	&& dpkg -i /tmp/nginx-1.12.1/nginx_1.12.1-1_amd64.deb
 
-# Start nginx
-CMD ["/opt/nginx/sbin/nginx"]
-EXPOSE 80
+COPY nginx/nginx.conf /opt/nginx/conf/nginx.conf
+
+
+COPY start.sh start.sh
+RUN chmod +x /start.sh
+# Start cassandra
+CMD ["/start.sh"]
+EXPOSE 80 443

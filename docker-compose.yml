@@ -1,6 +1,15 @@
----
-db:
-  image: db
-web:
-  image: web
-  links:
+version: '3'
+
+services:
+  db-cassandra:
+    container_name: db
+    build: ./db
+  web:
+    container_name: web
+    build: ./web
+    volumes:
+      - ./web/gocode:/usr/src/app
+    ports:
+      - 5080:80
+    depends_on:
+      - db-cassandra
