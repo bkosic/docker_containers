@@ -16,10 +16,14 @@ RUN echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | tee -a /e
     && sed  -i "/^[^#]*ulimit/ s/.*/#&/"  /etc/init.d/cassandra \
     && sed -i "s\Test Cluster\DB Cluster\g" /etc/cassandra/cassandra.yaml
 
+COPY start.sh start.sh
+RUN chmod +x /start.sh
+# Start cassandra
+CMD ["/start.sh"]
+
 # 7000: intra-node communication
 # 7001: TLS intra-node communication
 # 7199: JMX
 # 9042: CQL
 # 9160: thrift service
 EXPOSE 7000 7001 7199 9042 9160
-CMD ["cassandra", "-fR"]
